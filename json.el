@@ -2,8 +2,7 @@
 
 ;; Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
-;; Authors: Edward O'Connor <ted@oconnor.cx>
-;;          Ryan Crum <ryan.j.crum@gmail.com>
+;; Author: Edward O'Connor <ted@oconnor.cx>
 ;; Version: 1.3
 ;; Keywords: convenience
 
@@ -48,7 +47,7 @@
 ;;              other cleanups, bugfixes, and improvements.
 ;; 2006-12-29 - XEmacs support, from Aidan Kehoe <kehoea@parhasard.net>.
 ;; 2008-02-21 - Installed in GNU Emacs.
-;; 2011-05-11 - Added pretty-printed encoding ability.
+;; 2011-05-11 - Added pretty-printed encoding ability, from Ryan Crum <ryan.j.crum@gmail.com>.
 ;;              
 
 ;;; Code:
