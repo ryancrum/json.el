@@ -100,7 +100,10 @@ If this has the same value as `json-false', you might not be able to
 tell the difference between `false' and `null'. Consider let-binding
 this around your call to `json-read' instead of `setq'ing it.")
 
-(defvar json-encoding-seperator ", "
+(defvar json-encoding-default-separator ", "
+  "Value to use as an element seperator when encoding.")
+
+(defvar json-encoding-current-separator json-encoding-default-separator
   "Value to use as an element seperator when encoding.")
 
 (defvar json-encoding-default-indentation "  "
@@ -416,7 +419,7 @@ Please see the documentation of `json-object-type' and `json-key-type'."
                         r))
                 hash-table))
              r)
-           json-encoding-seperator)
+           json-encoding-current-separator)
           json-encoding-current-indentation))
 
 ;; List encoding (including alists and plists)
@@ -431,12 +434,14 @@ Please see the documentation of `json-object-type' and `json-key-type'."
                               json-encoding-default-indentation)
                     "")))             
              (mapcar (lambda (cons)
-                       (format (if json-encoding-pretty-print "%s%s: %s" "%s%s:%s")
+                       (format (if json-encoding-pretty-print
+                                   "%s%s: %s"
+                                 "%s%s:%s")
                                json-encoding-current-indentation
                                (json-encode (car cons))
                                (json-encode (cdr cons))))
                      alist))
-                     json-encoding-seperator)
+                     json-encoding-current-separator)
           json-encoding-current-indentation))
 
 (defun json-encode-plist (plist)
@@ -451,12 +456,14 @@ Please see the documentation of `json-object-type' and `json-key-type'."
         (push (concat
                json-encoding-current-indentation
                (json-encode (car plist))
-               (if json-encoding-current-indentation ": " ":")
+               (if json-encoding-current-indentation
+                   ": "
+                 ":")
                (json-encode (cadr plist)))
               result))
       (setq plist (cddr plist)))
     (concat (if json-encoding-pretty-print "{\n" "{")
-            (json-join (nreverse result) json-encoding-seperator)
+            (json-join (nreverse result) json-encoding-current-separator)
             (if json-encoding-pretty-print
                 (format "\n%s" json-encoding-current-indentation)
               "")
@@ -499,20 +506,19 @@ become JSON objects."
 
 (defun json-encode-array (array)
   "Return a JSON representation of ARRAY."
-  (if json-encoding-pretty-print
+  (if (and json-encoding-pretty-print
+           (< 0 (length array)))
       (concat 
-       (let ((json-encoding-current-indentation (concat json-encoding-current-indentation json-encoding-default-indentation)))
-         (concat
-          (format "[\n%s" json-encoding-current-indentation)
-          (json-join (mapcar 'json-encode array)
-                     (format "%s%s"
-                             json-encoding-seperator
-                             json-encoding-current-indentation))))
+       (let ((json-encoding-current-indentation
+              (concat json-encoding-current-indentation
+                      json-encoding-default-indentation)))
+         (concat (format "[\n%s" json-encoding-current-indentation)
+                 (json-join (mapcar 'json-encode array)
+                            (format "%s%s"
+                                    json-encoding-current-separator
+                                    json-encoding-current-indentation))))
        (format "\n%s]" json-encoding-current-indentation))
-    (concat             
-     "["
-     (mapconcat 'json-encode array json-encoding-seperator)
-     "]")))
+    (concat "[" (mapconcat 'json-encode array json-encoding-current-separator) "]")))
 
 
 
@@ -566,13 +572,10 @@ Advances point just past JSON object."
 
 (defun json-encode (object)
   "Return a JSON representation of OBJECT as a string."
-  (let ((json-encoding-seperator (if
-                                     (and json-encoding-pretty-print
-                                          (not (string=
-                                                (substring json-encoding-seperator -1)
-                                                "\n")))
-                                     (concat json-encoding-seperator "\n")
-                                   json-encoding-seperator)))
+  (let ((json-encoding-current-separator
+         (if json-encoding-pretty-print
+             (concat json-encoding-default-separator "\n")
+           json-encoding-default-separator)))
     (cond ((memq object (list t json-null json-false))
            (json-encode-keyword object))
           ((stringp object)      (json-encode-string object))
