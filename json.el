@@ -104,9 +104,17 @@ this around your call to `json-read' instead of `setq'ing it.")
 (defvar json-encoding-seperator ", "
   "Value to use as an element seperator when encoding.")
 
-(defvar json-encoding-default-indentation "  ")
-(defvar json-encoding-current-indentation "")
-(defvar json-encoding-pretty-print nil)
+(defvar json-encoding-default-indentation "  "
+  "The default indentation level for encoding. Used only when
+`json-encoding-pretty-print' is non-nil.")
+
+(defvar json-encoding-current-indentation ""
+  "Internally used to keep track of the current indentation level of
+encoding. Used only when `json-encoding-pretty-print' is non-nil.")
+
+(defvar json-encoding-pretty-print nil
+  "Setting this to non-nil will result in the output of `json-encode'
+to be pretty-printed.")
 
 ;;; Utilities
 
