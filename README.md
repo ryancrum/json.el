@@ -11,7 +11,7 @@ The user-serviceable entry points for the parser are the functions
 entry point, `json-encode`.
 
 Since there are several natural representations of key-value pair
-mappings in elisp (alist, plist, hash-table), `json-read' allows you
+mappings in elisp (alist, plist, hash-table), `json-read` allows you
 to specify which you'd prefer (see `json-object-type` and
 `json-array-type`).
 
